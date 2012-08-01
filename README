@@ -1,0 +1,13 @@
+### PianoPerformer ###
+
+This project aims to create a HTML5 code basis for piano players
+to read in their .mid files and let them show the keys to press
+in a waterfall like animation.
+
+planned features:
+ - Midi Keyboard input for interactive speed mode
+
+icons:
+CC-By-SA http://findicons.com/pack/653/the_spherical
+
+license: GPL 3.0
