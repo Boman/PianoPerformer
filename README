@@ -7,7 +7,11 @@ in a waterfall like animation.
 planned features:
  - Midi Keyboard input for interactive speed mode
 
-icons:
-CC-By-SA http://findicons.com/pack/653/the_spherical
+libs:
+ - jasmid (Matt Westcott & Ben Firshman)
 
-license: GPL 3.0
+icons:
+ - http://findicons.com/pack/653/the_spherical (CC-By-SA)
+
+license:
+ - GPL 3

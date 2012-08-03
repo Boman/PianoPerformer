@@ -52,6 +52,8 @@ p.initialize = function(w, h) {
 			this.keys[i + 2 * 52] = key;
 		}
 	}
+	
+	this.cache(0, 0, this.width, this.height);
 };
 
 p.addKey = function(imgName, x, y, scale) {

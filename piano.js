@@ -11,6 +11,10 @@ var controlBar;
 
 // status variables
 var playing;
+var speed;
+var songDuration; // in seconds
+var songPosition; // in seconds
+var notes = [];
 
 // dimensions
 var keyWidth;
@@ -19,8 +23,8 @@ var keyOffsetX;
 var keyScale;
 
 function init() {
-	windowWidth = $(window).width() - 25;
-	windowHeight = $(window).height() - 25;
+	windowWidth = $(document).width() - 1;
+	windowHeight = $(document).height() - 1;
 
 	$("#mainCanvas").attr({
 		width : windowWidth,
@@ -29,6 +33,13 @@ function init() {
 
 	stage = new Stage($("#mainCanvas").get(0));
 	Touch.enable(stage);
+
+	// status variables
+	playing = false;
+	speed = 1;
+	songDuration = 100;
+	songPosition = -1;
+	// console.log(notes);
 
 	// calculate dimensions
 	keyWidth = Math.floor(windowWidth / 52);
@@ -49,35 +60,50 @@ function init() {
 	keyPane.y = windowHeight - keyHeight - 50;
 	stage.addChild(keyPane);
 	// controlBar
-	
-	// status variables
-	playing = false;
-	speed = 1;
-	position = 0;
-	
+	controlBar = new ControlBar(keyWidth * 52, 50);
+	controlBar.x = keyOffsetX;
+	controlBar.y = windowHeight - 50;
+	stage.addChild(controlBar);
+
 	// start
 	stage.update();
 	lastTick = new Date();
 	tick();
 }
 
+function playPause(play) {
+	playing = play;
+	if (play) {
+		controlBar.playPauseButton.image = images["pause"];
+	} else {
+		controlBar.playPauseButton.image = images["play"];
+	}
+}
+
 var numFrames = 0;
 var cummulatedTime = 0;
+var actualFPS = 0;
+
 var lastTick;
 function tick() {
 	var tickTime = new Date();
 	var delta = Math.min(tickTime - lastTick, 1000);
 	lastTick = tickTime;
 
-	scrollPane.tick(delta);
+	if (playing) {
+		songPosition += delta * speed / 1000;
+	}
 
-	// numFrames++;
-	// cummulatedTime += delta;
-	// if (numFrames > 10) {
-	// console.log("FPS: " + (numFrames * 1000 / cummulatedTime));
-	// numFrames = 0;
-	// cummulatedTime = 0;
-	// }
+	scrollPane.tick(delta);
+	controlBar.tick(delta);
+
+	numFrames++;
+	cummulatedTime += delta;
+	if (numFrames > 20) {
+		actualFPS = numFrames * 1000 / cummulatedTime;
+		numFrames = 0;
+		cummulatedTime = 0;
+	}
 
 	stage.update();
 	requestAnimFrame(tick);

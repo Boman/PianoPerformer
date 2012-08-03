@@ -17,19 +17,24 @@ p.initialize = function(w, h) {
 	this.addChild(this.background);
 	this.addChild(this.scrollingNotes);
 
-	this.notes = [];
-	this.addNote(52, 1, "Green", 0);
-	this.addNote(56, 0.5, "Green", 0);
-	this.addNote(56, 0.25, "Green", 0.75);
+	this.pixelsPerSecond = 140;
+
+	this.noteBars = [];
+	for ( var i = 0; i < notes.length; ++i) {
+		this.addNote(notes[i].notePosition, notes[i].noteDuration, midiToneToKeyNumber(notes[i].noteNumber), "Green");
+	}
+	this.scrollingNotes.cache(0, -songDuration * this.pixelsPerSecond, this.width, songDuration * this.pixelsPerSecond
+			+ this.height);
 
 	this.drawBackground();
+	this.background.cache(0, 0, this.width, this.height);
 
 	this.onPress = this.handlePress;
 };
 
 p.drawBackground = function() {
 	var g = this.background.graphics;
-	g.beginFill(Graphics.getRGB(80, 80, 80));
+	g.beginFill(Graphics.getRGB(60, 60, 60));
 	g.rect(0, 0, this.width, this.height);
 	g.endFill();
 
@@ -44,12 +49,12 @@ p.drawBackground = function() {
 	}
 };
 
-p.addNote = function(tone, length, color, time) {
+p.addNote = function(time, length, tone, color) {
 	if (tone % 2 == 0) {
 		tone /= 2;
 		var x = Math.floor(this.width * tone / 52);
-		var y = Math.floor(-time * 80);
-		var height = Math.floor(length * 80);
+		var y = Math.floor(-time * this.pixelsPerSecond + this.height);
+		var height = Math.floor(length * this.pixelsPerSecond);
 		var bitmap = new Bitmap(images["bar" + color + "Top"]);
 		bitmap.setTransform(x, y - height);
 		this.scrollingNotes.addChild(bitmap);
@@ -60,7 +65,7 @@ p.addNote = function(tone, length, color, time) {
 		bitmap.setTransform(x, y - 6);
 		this.scrollingNotes.addChild(bitmap);
 
-		this.notes.push({
+		this.noteBars.push({
 			tone : tone,
 			length : length,
 			color : color,
@@ -70,21 +75,25 @@ p.addNote = function(tone, length, color, time) {
 };
 
 p.tick = function(delta) {
-	this.scrollingNotes.y += delta / 20;
-	// if ((this.bitmap.y < 0 && this.bitmap.speed < 0)
-	// || (this.bitmap.y + this.bitmap.image.height > this.height &&
-	// this.bitmap.speed > 0)) {
-	// this.bitmap.speed *= -1;
-	// }
-	// this.bitmap.y += delta * this.bitmap.speed / 1000;
+	scrollPane.scrollingNotes.y = Math.floor(songPosition * scrollPane.pixelsPerSecond);
 };
 
+var playingBeforeDrag;
 p.handlePress = function(event) {
+	playingBeforeDrag = playing;
+	playPause(false);
 	scrollPane.mouseOffset = event.stageY;
 	event.onMouseMove = this.handleMove;
+	event.onMouseUp = function() {
+		playPause(playingBeforeDrag);
+	};
 };
 
 p.handleMove = function(event) {
-	scrollPane.scrollingNotes.y += event.stageY - scrollPane.mouseOffset;
+	var newSongPosition = (scrollPane.scrollingNotes.y + event.stageY - scrollPane.mouseOffset)
+			/ scrollPane.pixelsPerSecond;
+	if (newSongPosition >= -2 && newSongPosition <= songDuration + 2) {
+		songPosition = newSongPosition;
+	}
 	scrollPane.mouseOffset = event.stageY;
 };
