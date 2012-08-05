@@ -40,22 +40,46 @@ var pressedKeys = [];
 
 p.tick = function(delta) {
 	var newPressedKeys = [];
-	for ( var i = 0; i < pressedKeys.length; ++i) {
-		if (pressedKeys[i] % 2 == 0) {
-			keys[pressedKeys[i]].image = images["whiteKey"];
-		} else {
-			keys[pressedKeys[i]].image = images["blackKey"];
-		}
-	}
 	// read pressed Keys
 	for ( var i = 0; i < notes.length; ++i) {
 		if (notes[i].notePosition <= songPosition && notes[i].notePosition + notes[i].noteDuration >= songPosition) {
 			var keyToPress = midiToneToKeyNumber(notes[i].noteNumber);
 			newPressedKeys.push(keyToPress);
-			if (keyToPress % 2 == 0) {
-				keys[keyToPress].image = images["whiteKeyPressed"];
+		}
+	}
+	for ( var i = 0; i < pressedKeys.length; ++i) {
+		var keyStillPressed = false;
+		for ( var j = 0; j < newPressedKeys.length; ++j) {
+			if (pressedKeys[i] == newPressedKeys[j]) {
+				keyStillPressed = true;
+			}
+		}
+		if (!keyStillPressed) {
+			console.log("off", keyNumberToMidiTone(pressedKeys[i]));
+			MIDI.noteOff(MIDI.pianoKeyOffset, keyNumberToMidiTone(pressedKeys[i]), 0);
+			if (pressedKeys[i] % 2 == 0) {
+				keys[pressedKeys[i]].image = images["whiteKey"];
 			} else {
-				keys[keyToPress].image = images["blackKeyPressed"];
+				keys[pressedKeys[i]].image = images["blackKey"];
+			}
+		}
+	}
+	for ( var i = 0; i < newPressedKeys.length; ++i) {
+		var keyAllreadyPressed = false;
+		for ( var j = 0; j < pressedKeys.length; ++j) {
+			if (newPressedKeys[i] == pressedKeys[j]) {
+				keyAllreadyPressed = true;
+			}
+		}
+		if (!keyAllreadyPressed) {
+			if (playing) {
+				console.log("on", keyNumberToMidiTone(newPressedKeys[i]));
+				MIDI.noteOn(MIDI.pianoKeyOffset, keyNumberToMidiTone(newPressedKeys[i]), 127, 0);
+			}
+			if (newPressedKeys[i] % 2 == 0) {
+				keys[newPressedKeys[i]].image = images["whiteKeyPressed"];
+			} else {
+				keys[newPressedKeys[i]].image = images["blackKeyPressed"];
 			}
 		}
 	}

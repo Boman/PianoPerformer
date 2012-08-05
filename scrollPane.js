@@ -26,9 +26,8 @@ p.initialize = function(w, h) {
 	for ( var i = 0; i < notes.length; ++i) {
 		this.addNote(notes[i].notePosition, notes[i].noteDuration, midiToneToKeyNumber(notes[i].noteNumber), "Green");
 	}
-	this.addNote(0, 1, 1, "Green");
-	this.scrollingNotes.cache(0, -songDuration * this.pixelsPerSecond, this.width, songDuration * this.pixelsPerSecond
-			+ this.height);
+	this.scrollingNotes.cache(0, -song.songDuration * this.pixelsPerSecond, this.width, song.songDuration
+			* this.pixelsPerSecond + this.height);
 
 	this.drawBackground();
 	this.background.cache(0, 0, this.width, this.height);
@@ -92,7 +91,7 @@ p.handlePress = function(event) {
 p.handleMove = function(event) {
 	var newSongPosition = (scrollPane.scrollingNotes.y + event.stageY - scrollPane.mouseOffset)
 			/ scrollPane.pixelsPerSecond;
-	if (newSongPosition >= -2 && newSongPosition <= songDuration + 2) {
+	if (newSongPosition >= -2 && newSongPosition <= song.songDuration + 2) {
 		songPosition = newSongPosition;
 	}
 	scrollPane.mouseOffset = event.stageY;

@@ -13,6 +13,7 @@ p.initialize = function() {
 p.loadMidi = function(fileName, onloadHandler) {
 	this.midiFileName = fileName;
 	thisSong = this;
+	this.songDuration = 0;
 	loadRemote(fileName, function(data) {
 		thisSong.midiFileData = MidiFile(data);
 		thisSong.readMidiNotes();
@@ -122,5 +123,6 @@ p.readMidiNotes = function() {
 	while (!finished) {
 		handleEvent();
 		getNextEvent(this.midiFileData);
+		this.songDuration = eventPosition;
 	}
 };

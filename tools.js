@@ -56,6 +56,17 @@ function midiToneToKeyNumber(midiTone) {
 	return keyNumber;
 }
 
+function keyNumberToMidiTone(keyNumber) {
+	var midiTone = keyNumber - Math.floor(keyNumber / 14) * 2;
+	if (midiTone % 12 > 3) {
+		midiTone -= 1;
+	}
+	if (midiTone % 12 > 7) {
+		midiTone -= 1;
+	}
+	return midiTone + 21;
+}
+
 function getBlackKeyXOffset(key) {
 	switch (key % 14) {
 	case 1:

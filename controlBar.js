@@ -58,9 +58,9 @@ function handlePlayPausePress(event) {
 };
 
 p.tick = function(delta) {
-	var tmpSongPosition = Math.min(songDuration, Math.max(0, songPosition));
+	var tmpSongPosition = Math.min(song.songDuration, Math.max(0, songPosition));
 
-	this.progressText.text = timeToString(tmpSongPosition) + " / " + timeToString(songDuration);
+	this.progressText.text = timeToString(tmpSongPosition) + " / " + timeToString(song.songDuration);
 
 	// var width = Math.floor(120 * tmpSongPosition / songDuration);
 	// this.backGroundGraphics.beginFill(Graphics.getRGB(140, 200, 60));

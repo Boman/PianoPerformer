@@ -14,7 +14,6 @@ var controlBar;
 // status variables
 var playing;
 var speed;
-var songDuration; // in seconds
 var songPosition; // in seconds
 var notes = [];
 
@@ -26,21 +25,28 @@ var keyScale;
 
 var controlBarHeight = 70;
 
+var midjsLoaded = false;
 function initPiano() {
 	if (imagesToLoad.length != 0) {
 		loadImages(initPiano);
 	} else {
-		if (!song) {
+		if (!song || song.midiFileName != songFileName) {
 			song = new Song();
 			song.loadMidi(songFileName, initPiano);
 		} else {
-			// status variables
-			playing = false;
-			speed = 1;
-			songDuration = 100;
-			songPosition = -1;
+			if (!midjsLoaded) {
+				MIDI.loadPlugin(function() {
+					midjsLoaded = true;
+					initPiano();
+				}, "/libs/midi.js/soundfont/soundfont-ogg.js");
+			} else {
+				// status variables
+				playing = false;
+				speed = 1;
+				songPosition = -1;
 
-			createGUI();
+				createGUI();
+			}
 		}
 	}
 }
@@ -108,7 +114,11 @@ function tick() {
 	lastTick = tickTime;
 
 	if (playing) {
-		songPosition += delta * speed / 1000;
+		if (songPosition >= song.songDuration + 1) {
+			playPause(false);
+		} else {
+			songPosition += delta * speed / 1000;
+		}
 	}
 
 	scrollPane.tick(delta);
@@ -143,7 +153,7 @@ function handleKeyUp(e) {
 		songPosition = Math.max(0, songPosition) - 2;
 		return false;
 	case KEYCODE_RIGHT:
-		songPosition = Math.min(songDuration, songPosition) + 2;
+		songPosition = Math.min(song.songDuration, songPosition) + 2;
 		return false;
 	case KEYCODE_UP:
 		speed += 0.1;
