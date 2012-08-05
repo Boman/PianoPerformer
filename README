@@ -8,6 +8,7 @@ planned features:
  - Midi Keyboard input for interactive speed mode
 
 libs:
+ - MIDI.js https://github.com/mudcube/MIDI.js
  - jasmid (Matt Westcott & Ben Firshman)
  - audiolet https://github.com/oampo/Audiolet/wiki
  - https://github.com/abudaan/midibridge-js
