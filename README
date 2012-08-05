@@ -9,9 +9,11 @@ planned features:
 
 libs:
  - jasmid (Matt Westcott & Ben Firshman)
+ - audiolet https://github.com/oampo/Audiolet/wiki
+ - https://github.com/abudaan/midibridge-js
 
 icons:
  - http://findicons.com/pack/653/the_spherical (CC-By-SA)
 
 license:
- - GPL 3
+ - GPL v3

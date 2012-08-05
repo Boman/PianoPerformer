@@ -12,17 +12,21 @@ p.initialize = function(w, h) {
 	this.Container_initialize();
 	this.width = w;
 	this.height = h;
+	this.snapToPixel = true;
+
 	this.background = new Shape();
+	this.background.snapToPixel = true;
 	this.scrollingNotes = new Container();
+	this.scrollingNotes.snapToPixel = true;
 	this.addChild(this.background);
 	this.addChild(this.scrollingNotes);
 
 	this.pixelsPerSecond = 140;
 
-	this.noteBars = [];
 	for ( var i = 0; i < notes.length; ++i) {
 		this.addNote(notes[i].notePosition, notes[i].noteDuration, midiToneToKeyNumber(notes[i].noteNumber), "Green");
 	}
+	this.addNote(0, 1, 1, "Green");
 	this.scrollingNotes.cache(0, -songDuration * this.pixelsPerSecond, this.width, songDuration * this.pixelsPerSecond
 			+ this.height);
 
@@ -50,27 +54,23 @@ p.drawBackground = function() {
 };
 
 p.addNote = function(time, length, tone, color) {
+	// white note bars
 	if (tone % 2 == 0) {
-		tone /= 2;
-		var x = Math.floor(this.width * tone / 52);
+		var x = Math.floor(this.width * tone / 104);
 		var y = Math.floor(-time * this.pixelsPerSecond + this.height);
 		var height = Math.floor(length * this.pixelsPerSecond);
-		var bitmap = new Bitmap(images["bar" + color + "Top"]);
-		bitmap.setTransform(x, y - height);
+		var bitmap = new Bitmap(images["bar" + color]);
+		bitmap.setTransform(x, y - height, keyScale, height / 115);
 		this.scrollingNotes.addChild(bitmap);
-		var bitmap = new Bitmap(images["bar" + color + "Middle"]);
-		bitmap.setTransform(x, y - height + 6, 1, height - 12);
+	}
+	// black note bars
+	else {
+		var x = Math.floor((tone / 2 + getBlackKeyXOffset(tone)) * whiteKeyWidth);
+		var y = Math.floor(-time * this.pixelsPerSecond + this.height);
+		var height = Math.floor(length * this.pixelsPerSecond);
+		var bitmap = new Bitmap(images["blackBar" + color]);
+		bitmap.setTransform(x, y - height, keyScale, height / 82);
 		this.scrollingNotes.addChild(bitmap);
-		var bitmap = new Bitmap(images["bar" + color + "Bottom"]);
-		bitmap.setTransform(x, y - 6);
-		this.scrollingNotes.addChild(bitmap);
-
-		this.noteBars.push({
-			tone : tone,
-			length : length,
-			color : color,
-			time : time
-		});
 	}
 };
 

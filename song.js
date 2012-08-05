@@ -1,20 +1,34 @@
-function loadMidi(midiFileName, handler) {
-	loadRemote(midiFileName, function(data) {
-		var midiFile = MidiFile(data);
-		Replayer(midiFile);
-		handler();
-	});
+function Song() {
+	this.initialize();
 }
 
-function Replayer(midiFile) {
+window.Song = Song;
+
+var p = Song.prototype;
+
+p.initialize = function() {
+	this.notes = [];
+};
+
+p.loadMidi = function(fileName, onloadHandler) {
+	this.midiFileName = fileName;
+	thisSong = this;
+	loadRemote(fileName, function(data) {
+		thisSong.midiFileData = MidiFile(data);
+		thisSong.readMidiNotes();
+		onloadHandler();
+	});
+};
+
+p.readMidiNotes = function() {
 	var trackStates = [];
 	var beatsPerMinute = 120;
-	var ticksPerBeat = midiFile.header.ticksPerBeat;
+	var ticksPerBeat = this.midiFileData.header.ticksPerBeat;
 
-	for ( var i = 0; i < midiFile.tracks.length; i++) {
+	for ( var i = 0; i < this.midiFileData.tracks.length; i++) {
 		trackStates[i] = {
 			'nextEventIndex' : 0,
-			'ticksToNextEvent' : (midiFile.tracks[i].length ? midiFile.tracks[i][0].deltaTime : null)
+			'ticksToNextEvent' : (this.midiFileData.tracks[i].length ? this.midiFileData.tracks[i][0].deltaTime : null)
 		};
 	}
 
@@ -24,7 +38,7 @@ function Replayer(midiFile) {
 
 	var nextEventInfo;
 
-	function getNextEvent() {
+	function getNextEvent(midiFileData) {
 		var ticksToNextEvent = null;
 		var nextEventTrack = null;
 		var nextEventIndex = null;
@@ -39,9 +53,9 @@ function Replayer(midiFile) {
 		}
 		if (nextEventTrack != null) {
 			/* consume event from that track */
-			var nextEvent = midiFile.tracks[nextEventTrack][nextEventIndex];
-			if (midiFile.tracks[nextEventTrack][nextEventIndex + 1]) {
-				trackStates[nextEventTrack].ticksToNextEvent += midiFile.tracks[nextEventTrack][nextEventIndex + 1].deltaTime;
+			var nextEvent = midiFileData.tracks[nextEventTrack][nextEventIndex];
+			if (midiFileData.tracks[nextEventTrack][nextEventIndex + 1]) {
+				trackStates[nextEventTrack].ticksToNextEvent += midiFileData.tracks[nextEventTrack][nextEventIndex + 1].deltaTime;
 			} else {
 				trackStates[nextEventTrack].ticksToNextEvent = null;
 			}
@@ -65,7 +79,7 @@ function Replayer(midiFile) {
 		}
 	}
 
-	getNextEvent();
+	getNextEvent(this.midiFileData);
 
 	function handleEvent() {
 		var event = nextEventInfo.event;
@@ -81,12 +95,12 @@ function Replayer(midiFile) {
 			switch (event.subtype) {
 			case 'noteOn':
 				// look if note is already pressed
-				for ( var i = 0; i < notes.length; ++i) {
-					if (notes[i].noteNumber == event.noteNumber && notes[i].noteDuration == 0) {
-						notes[i].noteDuration = eventPosition - notes[i].notePosition;
+				for ( var i = 0; i < this.notes.length; ++i) {
+					if (this.notes[i].noteNumber == event.noteNumber && this.notes[i].noteDuration == 0) {
+						this.notes[i].noteDuration = eventPosition - this.notes[i].notePosition;
 					}
 				}
-				notes.push({
+				this.notes.push({
 					notePosition : eventPosition,
 					noteNumber : event.noteNumber,
 					noteVelocity : event.velocity,
@@ -94,9 +108,9 @@ function Replayer(midiFile) {
 				});
 				break;
 			case 'noteOff':
-				for ( var i = 0; i < notes.length; ++i) {
-					if (notes[i].noteNumber == event.noteNumber && notes[i].noteDuration == 0) {
-						notes[i].noteDuration = eventPosition - notes[i].notePosition;
+				for ( var i = 0; i < this.notes.length; ++i) {
+					if (this.notes[i].noteNumber == event.noteNumber && this.notes[i].noteDuration == 0) {
+						this.notes[i].noteDuration = eventPosition - this.notes[i].notePosition;
 					}
 				}
 				break;
@@ -107,6 +121,6 @@ function Replayer(midiFile) {
 
 	while (!finished) {
 		handleEvent();
-		getNextEvent();
+		getNextEvent(this.midiFileData);
 	}
-}
+};

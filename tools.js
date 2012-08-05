@@ -6,24 +6,31 @@ window.requestAnimFrame = (function() {
 })();
 
 var imagesToLoad = [ [ "whiteKey", "images/white_key.png" ], [ "whiteKeyPressed", "images/white_key_pressed.png" ],
-		[ "blackKey", "images/black_key.png" ], [ "barGreen", "images/bar_green.png" ],
-		[ "barGreenTop", "images/bar_green_top.png" ], [ "barGreenMiddle", "images/bar_green_middle.png" ],
-		[ "barGreenBottom", "images/bar_green_bottom.png" ], [ "pianoBar", "images/piano_bar.png" ],
-		[ "play", "images/play.png" ], [ "pause", "images/pause.png" ] ];
+		[ "blackKey", "images/black_key.png" ], [ "blackKeyPressed", "images/black_key.png" ],
+		[ "barGreen", "images/bar_green.png" ], [ "blackBarGreen", "images/black_bar_green.png" ],
+		[ "pianoBar", "images/piano_bar.png" ], [ "back", "images/back.png" ], [ "play", "images/play.png" ],
+		[ "pause", "images/pause.png" ] ];
 
-$(function() {
-	loadImage();
-});
+// usefull keycodes
+var KEYCODE_ENTER = 13;
+var KEYCODE_ESC = 27;
+var KEYCODE_SPACE = 32;
+var KEYCODE_UP = 38;
+var KEYCODE_DOWN = 40;
+var KEYCODE_LEFT = 37;
+var KEYCODE_RIGHT = 39;
 
-function loadImage() {
+function loadImages(onloadHandler) {
 	if (imagesToLoad.length <= 0) {
-		loadMidi("resources/mozart_turkish_march.mid", init);
+		onloadHandler();
 	} else {
 		var img = new Image();
 		var imageToLoad = imagesToLoad.shift();
 		img.src = imageToLoad[1];
 		images[imageToLoad[0]] = img;
-		img.onload = loadImage;
+		img.onload = function() {
+			loadImages(onloadHandler);
+		};
 	}
 }
 
@@ -38,7 +45,7 @@ function timeToString(time) {
 }
 
 function midiToneToKeyNumber(midiTone) {
-	var keyNumber = midiTone - 57;
+	var keyNumber = midiTone - 21;
 	keyNumber += Math.floor(keyNumber / 12) * 2;
 	if (keyNumber % 14 > 2) {
 		keyNumber += 1;
@@ -46,5 +53,20 @@ function midiToneToKeyNumber(midiTone) {
 	if (keyNumber % 14 > 8) {
 		keyNumber += 1;
 	}
-	return keyNumber + 42;
+	return keyNumber;
+}
+
+function getBlackKeyXOffset(key) {
+	switch (key % 14) {
+	case 1:
+	case 7:
+		return 0.28;
+	case 13:
+		return 0.2;
+	case 5:
+	case 11:
+		return 0.12;
+	default:
+		return 0;
+	}
 }

@@ -7,8 +7,9 @@
 	src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 <script src="http://code.createjs.com/easeljs-0.4.2.min.js"></script>
 <script src="http://code.createjs.com/preloadjs-0.1.0.min.js"></script>
+<script type="text/javascript" src="menu.js"></script>
 <script type="text/javascript" src="piano.js"></script>
-<script type="text/javascript" src="keys.js"></script>
+<script type="text/javascript" src="keyPane.js"></script>
 <script type="text/javascript" src="scrollPane.js"></script>
 <script type="text/javascript" src="tools.js"></script>
 <script type="text/javascript" src="controlBar.js"></script>
@@ -16,8 +17,26 @@
 <script type="text/javascript" src="libs/jasmid/tools.js"></script>
 <script type="text/javascript" src="libs/jasmid/midifile.js"></script>
 <script type="text/javascript" src="libs/jasmid/stream.js"></script>
+<script type="text/javascript">
+	//<![CDATA
+	$(function() {
+		loadSongs();
+	});
+	//]]>
+</script>
 </head>
 <body>
+	<div id="mainMenu">
+		<h1>PianoPerformer</h1>
+		<h3>Song Selection</h3>
+		<table id="songTable">
+			<tbody>
+				<tr>
+					<th>title</th>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 	<canvas id="mainCanvas"></canvas>
 </body>
 </head>

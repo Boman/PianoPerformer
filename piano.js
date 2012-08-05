@@ -3,6 +3,8 @@ var windowHeight;
 
 var images = [];
 
+var song;
+
 // gui elements
 var stage;
 var scrollPane;
@@ -17,12 +19,33 @@ var songPosition; // in seconds
 var notes = [];
 
 // dimensions
-var keyWidth;
-var keyHeight;
+var whiteKeyWidth;
+var whiteKeyHeight;
 var keyOffsetX;
 var keyScale;
 
-function init() {
+var controlBarHeight = 70;
+
+function initPiano() {
+	if (imagesToLoad.length != 0) {
+		loadImages(initPiano);
+	} else {
+		if (!song) {
+			song = new Song();
+			song.loadMidi(songFileName, initPiano);
+		} else {
+			// status variables
+			playing = false;
+			speed = 1;
+			songDuration = 100;
+			songPosition = -1;
+
+			createGUI();
+		}
+	}
+}
+
+function createGUI() {
 	windowWidth = $(document).width() - 1;
 	windowHeight = $(document).height() - 1;
 
@@ -32,37 +55,31 @@ function init() {
 	});
 
 	stage = new Stage($("#mainCanvas").get(0));
+	stage.snapToPixel = true;
 	Touch.enable(stage);
 
-	// status variables
-	playing = false;
-	speed = 1;
-	songDuration = 100;
-	songPosition = -1;
-	// console.log(notes);
-
 	// calculate dimensions
-	keyWidth = Math.floor(windowWidth / 52);
-	keyHeight = Math.floor(keyWidth * 177 / 28);
-	keyOffsetX = Math.floor((windowWidth - 52 * keyWidth) / 2);
-	keyScale = keyWidth / 28;
+	whiteKeyWidth = Math.floor(windowWidth / 52);
+	whiteKeyHeight = Math.floor(whiteKeyWidth * 177 / 28);
+	keyOffsetX = Math.floor((windowWidth - 52 * whiteKeyWidth) / 2);
+	keyScale = whiteKeyWidth / 28;
 	// scrollPane
-	scrollPane = new ScrollPane(windowWidth - 2 * keyOffsetX, windowHeight - keyHeight - 55);
+	scrollPane = new ScrollPane(windowWidth - 2 * keyOffsetX, windowHeight - whiteKeyHeight - controlBarHeight - 5);
 	scrollPane.x += keyOffsetX;
 	stage.addChild(scrollPane);
 	// bar between notes and keys
 	var pianoBar = new Bitmap(images["pianoBar"]);
 	stage.addChild(pianoBar);
-	pianoBar.setTransform(keyOffsetX, windowHeight - keyHeight - 55, keyWidth * 52, 1);
+	pianoBar.setTransform(keyOffsetX, windowHeight - whiteKeyHeight - controlBarHeight - 5, whiteKeyWidth * 52, 1);
 	// keyPane
-	keyPane = new KeyPane(keyWidth * 52, keyHeight);
+	keyPane = new KeyPane(whiteKeyWidth * 52, whiteKeyHeight);
 	keyPane.x = keyOffsetX;
-	keyPane.y = windowHeight - keyHeight - 50;
+	keyPane.y = windowHeight - whiteKeyHeight - controlBarHeight;
 	stage.addChild(keyPane);
 	// controlBar
-	controlBar = new ControlBar(keyWidth * 52, 50);
+	controlBar = new ControlBar(whiteKeyWidth * 52, controlBarHeight);
 	controlBar.x = keyOffsetX;
-	controlBar.y = windowHeight - 50;
+	controlBar.y = windowHeight - controlBarHeight;
 	stage.addChild(controlBar);
 
 	// start
@@ -95,6 +112,7 @@ function tick() {
 	}
 
 	scrollPane.tick(delta);
+	keyPane.tick(delta);
 	controlBar.tick(delta);
 
 	numFrames++;
@@ -107,4 +125,36 @@ function tick() {
 
 	stage.update();
 	requestAnimFrame(tick);
+}
+
+// register key functions
+document.onkeyup = handleKeyUp;
+
+function handleKeyUp(e) {
+	// cross browser issues exist
+	if (!e) {
+		var e = window.event;
+	}
+	switch (e.keyCode) {
+	case KEYCODE_SPACE:
+		playPause(!playing);
+		return false;
+	case KEYCODE_LEFT:
+		songPosition = Math.max(0, songPosition) - 2;
+		return false;
+	case KEYCODE_RIGHT:
+		songPosition = Math.min(songDuration, songPosition) + 2;
+		return false;
+	case KEYCODE_UP:
+		speed += 0.1;
+		return false;
+	case KEYCODE_DOWN:
+		speed -= 0.1;
+		return false;
+	case KEYCODE_ENTER:
+		return false;
+	case KEYCODE_ESC:
+		showMenu();
+		return false;
+	}
 }
