@@ -8,6 +8,7 @@ var song;
 // gui elements
 var stage;
 var scrollPane;
+var pianoBar;
 var keyPane;
 var controlBar;
 
@@ -15,7 +16,6 @@ var controlBar;
 var playing;
 var speed;
 var songPosition; // in seconds
-var notes = [];
 
 // dimensions
 var whiteKeyWidth;
@@ -46,35 +46,36 @@ function initPiano() {
 				songPosition = -1;
 
 				createGUI();
+
+				$(window).resize(resizeGUI);
+
+				// register key functions
+				document.onkeyup = function() {
+					handleKeyUp(true);
+				};
+
+				// start
+				stage.update();
+				lastTick = new Date();
+				tick();
 			}
 		}
 	}
 }
 
 function createGUI() {
-	windowWidth = $(document).width() - 1;
-	windowHeight = $(document).height() - 1;
-
-	$("#mainCanvas").attr({
-		width : windowWidth,
-		height : windowHeight
-	});
+	resizeGUI(false);
 
 	stage = new Stage($("#mainCanvas").get(0));
 	stage.snapToPixel = true;
 	Touch.enable(stage);
 
-	// calculate dimensions
-	whiteKeyWidth = Math.floor(windowWidth / 52);
-	whiteKeyHeight = Math.floor(whiteKeyWidth * 177 / 28);
-	keyOffsetX = Math.floor((windowWidth - 52 * whiteKeyWidth) / 2);
-	keyScale = whiteKeyWidth / 28;
 	// scrollPane
 	scrollPane = new ScrollPane(windowWidth - 2 * keyOffsetX, windowHeight - whiteKeyHeight - controlBarHeight - 5);
-	scrollPane.x += keyOffsetX;
+	scrollPane.x = keyOffsetX;
 	stage.addChild(scrollPane);
 	// bar between notes and keys
-	var pianoBar = new Bitmap(images["pianoBar"]);
+	pianoBar = new Bitmap(images["pianoBar"]);
 	stage.addChild(pianoBar);
 	pianoBar.setTransform(keyOffsetX, windowHeight - whiteKeyHeight - controlBarHeight - 5, whiteKeyWidth * 52, 1);
 	// keyPane
@@ -87,11 +88,37 @@ function createGUI() {
 	controlBar.x = keyOffsetX;
 	controlBar.y = windowHeight - controlBarHeight;
 	stage.addChild(controlBar);
+}
 
-	// start
-	stage.update();
-	lastTick = new Date();
-	tick();
+function resizeGUI(resizeComponents) {
+	if (windowWidth != $(document).width() || windowHeight != $(document).height()) {
+		windowWidth = $(document).width();
+		windowHeight = $(document).height();
+
+		$("#mainCanvas").attr({
+			width : windowWidth,
+			height : windowHeight
+		});
+
+		// calculate dimensions
+		whiteKeyWidth = Math.floor(windowWidth / 52);
+		whiteKeyHeight = Math.floor(whiteKeyWidth * 177 / 28);
+		keyOffsetX = Math.floor((windowWidth - 52 * whiteKeyWidth) / 2);
+		keyScale = whiteKeyWidth / 28;
+
+		if (resizeComponents) {
+			scrollPane.resize(windowWidth - 2 * keyOffsetX, windowHeight - whiteKeyHeight - controlBarHeight - 5);
+			scrollPane.x = keyOffsetX;
+			pianoBar.setTransform(keyOffsetX, windowHeight - whiteKeyHeight - controlBarHeight - 5, whiteKeyWidth * 52,
+					1);
+			keyPane.resize(whiteKeyWidth * 52, whiteKeyHeight);
+			keyPane.x = keyOffsetX;
+			keyPane.y = windowHeight - whiteKeyHeight - controlBarHeight;
+			controlBar.resize(whiteKeyWidth * 52, controlBarHeight);
+			controlBar.x = keyOffsetX;
+			controlBar.y = windowHeight - controlBarHeight;
+		}
+	}
 }
 
 function playPause(play) {
@@ -103,6 +130,7 @@ function playPause(play) {
 	}
 }
 
+// FPS variables
 var numFrames = 0;
 var cummulatedTime = 0;
 var actualFPS = 0;
@@ -122,7 +150,7 @@ function tick() {
 	}
 
 	scrollPane.tick(delta);
-	keyPane.tick(delta);
+	song.tick(delta);
 	controlBar.tick(delta);
 
 	numFrames++;
@@ -136,9 +164,6 @@ function tick() {
 	stage.update();
 	requestAnimFrame(tick);
 }
-
-// register key functions
-document.onkeyup = handleKeyUp;
 
 function handleKeyUp(e) {
 	// cross browser issues exist

@@ -53,6 +53,12 @@ p.initialize = function(w, h) {
 	this.speedText.snapToPixel = true;
 };
 
+p.resize = function(w, h) {
+	this.width = w;
+	this.height = h;
+	// TODO
+};
+
 function handlePlayPausePress(event) {
 	playPause(controlBar.playPauseButton.image == images["play"]);
 };

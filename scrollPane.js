@@ -8,6 +8,8 @@ var p = ScrollPane.prototype = new Container();
 
 p.Container_initialize = p.initialize; // unique to avoid overiding base class
 
+var colorsForTracks = [ "Green", "Blue" ];
+
 p.initialize = function(w, h) {
 	this.Container_initialize();
 	this.width = w;
@@ -23,8 +25,9 @@ p.initialize = function(w, h) {
 
 	this.pixelsPerSecond = 140;
 
-	for ( var i = 0; i < notes.length; ++i) {
-		this.addNote(notes[i].notePosition, notes[i].noteDuration, midiToneToKeyNumber(notes[i].noteNumber), "Green");
+	for ( var i = 0; i < song.notes.length; ++i) {
+		this.addNote(song.notes[i].notePosition, song.notes[i].noteDuration,
+				midiToneToKeyNumber(song.notes[i].noteNumber), colorsForTracks[song.notes[i].noteTrack]);
 	}
 	this.scrollingNotes.cache(0, -song.songDuration * this.pixelsPerSecond, this.width, song.songDuration
 			* this.pixelsPerSecond + this.height);
@@ -33,6 +36,14 @@ p.initialize = function(w, h) {
 	this.background.cache(0, 0, this.width, this.height);
 
 	this.onPress = this.handlePress;
+};
+
+p.resize = function(w, h) {
+	this.width = w;
+	this.height = h;
+	this.drawBackground();
+	this.background.cache(0, 0, this.width, this.height);
+	// TODO
 };
 
 p.drawBackground = function() {

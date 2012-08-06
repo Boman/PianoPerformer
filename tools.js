@@ -8,6 +8,7 @@ window.requestAnimFrame = (function() {
 var imagesToLoad = [ [ "whiteKey", "images/white_key.png" ], [ "whiteKeyPressed", "images/white_key_pressed.png" ],
 		[ "blackKey", "images/black_key.png" ], [ "blackKeyPressed", "images/black_key.png" ],
 		[ "barGreen", "images/bar_green.png" ], [ "blackBarGreen", "images/black_bar_green.png" ],
+		[ "barBlue", "images/bar_blue.png" ], [ "blackBarBlue", "images/black_bar_blue.png" ],
 		[ "pianoBar", "images/piano_bar.png" ], [ "back", "images/back.png" ], [ "play", "images/play.png" ],
 		[ "pause", "images/pause.png" ] ];
 
