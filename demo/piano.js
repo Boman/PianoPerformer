@@ -39,7 +39,7 @@ function initPiano() {
 				MIDI.loadPlugin(function() {
 					midjsLoaded = true;
 					initPiano();
-				}, "/libs/midi.js/soundfont/soundfont-ogg.js");
+				}, "libs/midi.js/soundfont/soundfont-ogg.js");
 			} else {
 				// status variables
 				stop = false;
