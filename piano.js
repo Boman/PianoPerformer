@@ -13,6 +13,7 @@ var keyPane;
 var controlBar;
 
 // status variables
+var stop = true;
 var playing;
 var speed;
 var songPosition; // in seconds
@@ -23,7 +24,7 @@ var whiteKeyHeight;
 var keyOffsetX;
 var keyScale;
 
-var controlBarHeight = 70;
+var controlBarHeight = 40;
 
 var midjsLoaded = false;
 function initPiano() {
@@ -41,18 +42,19 @@ function initPiano() {
 				}, "/libs/midi.js/soundfont/soundfont-ogg.js");
 			} else {
 				// status variables
+				stop = false;
 				playing = false;
 				speed = 1;
 				songPosition = -1;
 
 				createGUI();
 
-				$(window).resize(resizeGUI);
+				$(window).resize(function() {
+					resizeGUI(true);
+				});
 
 				// register key functions
-				document.onkeyup = function() {
-					handleKeyUp(true);
-				};
+				document.onkeyup = handleKeyUp;
 
 				// start
 				stage.update();
@@ -73,6 +75,7 @@ function createGUI() {
 	// scrollPane
 	scrollPane = new ScrollPane(windowWidth - 2 * keyOffsetX, windowHeight - whiteKeyHeight - controlBarHeight - 5);
 	scrollPane.x = keyOffsetX;
+	scrollPane.drawNotes();
 	stage.addChild(scrollPane);
 	// bar between notes and keys
 	pianoBar = new Bitmap(images["pianoBar"]);
@@ -91,9 +94,9 @@ function createGUI() {
 }
 
 function resizeGUI(resizeComponents) {
-	if (windowWidth != $(document).width() || windowHeight != $(document).height()) {
-		windowWidth = $(document).width();
-		windowHeight = $(document).height();
+	if (windowWidth != $("#mainCanvas").width() || windowHeight != $("#mainCanvas").height()) {
+		windowWidth = $("#mainCanvas").width();
+		windowHeight = $("#mainCanvas").height();
 
 		$("#mainCanvas").attr({
 			width : windowWidth,
@@ -125,6 +128,10 @@ function playPause(play) {
 	playing = play;
 	if (play) {
 		controlBar.playPauseButton.image = images["pause"];
+		// start the song again
+		if (songPosition >= song.songDuration + 1) {
+			songPosition = -1;
+		}
 	} else {
 		controlBar.playPauseButton.image = images["play"];
 	}
@@ -139,29 +146,31 @@ var lastTick;
 function tick() {
 	var tickTime = new Date();
 	var delta = Math.min(tickTime - lastTick, 1000);
-	lastTick = tickTime;
+	if (!stop && delta > 10) {
+		lastTick = tickTime;
 
-	if (playing) {
-		if (songPosition >= song.songDuration + 1) {
-			playPause(false);
-		} else {
-			songPosition += delta * speed / 1000;
+		if (playing) {
+			if (songPosition >= song.songDuration + 1) {
+				playPause(false);
+			} else {
+				songPosition += delta * speed / 1000;
+			}
 		}
+
+		scrollPane.tick(delta);
+		song.tick(delta);
+		controlBar.tick(delta);
+
+		numFrames++;
+		cummulatedTime += delta;
+		if (numFrames > 20) {
+			actualFPS = numFrames * 1000 / cummulatedTime;
+			numFrames = 0;
+			cummulatedTime = 0;
+		}
+
+		stage.update();
 	}
-
-	scrollPane.tick(delta);
-	song.tick(delta);
-	controlBar.tick(delta);
-
-	numFrames++;
-	cummulatedTime += delta;
-	if (numFrames > 20) {
-		actualFPS = numFrames * 1000 / cummulatedTime;
-		numFrames = 0;
-		cummulatedTime = 0;
-	}
-
-	stage.update();
 	requestAnimFrame(tick);
 }
 

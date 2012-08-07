@@ -25,31 +25,31 @@ p.initialize = function(w, h) {
 	this.backButton = new Bitmap(images["back"]);
 	this.addChild(this.backButton);
 	this.backButton.onPress = showMenu;
-	this.backButton.setTransform(this.width - 50, 15);
+	this.backButton.setTransform(this.width - 50, 5);
 	this.backButton.snapToPixel = true;
 
 	this.playPauseButton = new Bitmap(images["play"]);
 	this.addChild(this.playPauseButton);
 	this.playPauseButton.onPress = handlePlayPausePress;
-	this.playPauseButton.setTransform(10, 15);
+	this.playPauseButton.setTransform(10, 5);
 	this.playPauseButton.snapToPixel = true;
 
 	this.progressText = new Text("", "16px bold arial, sans-serif", Graphics.getRGB(157, 243, 90));
 	this.addChild(this.progressText);
 	this.progressText.x = 98;
-	this.progressText.y = 25;
+	this.progressText.y = 20;
 	this.progressText.snapToPixel = true;
 
 	this.fpsText = new Text("", "16px bold arial, sans-serif", Graphics.getRGB(157, 243, 90));
 	this.addChild(this.fpsText);
 	this.fpsText.x = 250;
-	this.fpsText.y = 25;
+	this.fpsText.y = 20;
 	this.fpsText.snapToPixel = true;
 
 	this.speedText = new Text("", "16px bold arial, sans-serif", Graphics.getRGB(157, 243, 90));
 	this.addChild(this.speedText);
 	this.speedText.x = 400;
-	this.speedText.y = 25;
+	this.speedText.y = 20;
 	this.speedText.snapToPixel = true;
 };
 

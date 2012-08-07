@@ -8,7 +8,7 @@ var p = ScrollPane.prototype = new Container();
 
 p.Container_initialize = p.initialize; // unique to avoid overiding base class
 
-var colorsForTracks = [ "Green", "Blue" ];
+var colorsForTracks = [ "Green", "Blue", "Green", "Blue" ];
 
 p.initialize = function(w, h) {
 	this.Container_initialize();
@@ -23,14 +23,7 @@ p.initialize = function(w, h) {
 	this.addChild(this.background);
 	this.addChild(this.scrollingNotes);
 
-	this.pixelsPerSecond = 140;
-
-	for ( var i = 0; i < song.notes.length; ++i) {
-		this.addNote(song.notes[i].notePosition, song.notes[i].noteDuration,
-				midiToneToKeyNumber(song.notes[i].noteNumber), colorsForTracks[song.notes[i].noteTrack]);
-	}
-	this.scrollingNotes.cache(0, -song.songDuration * this.pixelsPerSecond, this.width, song.songDuration
-			* this.pixelsPerSecond + this.height);
+	this.pixelsPerSecond = 100;// 140
 
 	this.drawBackground();
 	this.background.cache(0, 0, this.width, this.height);
@@ -43,7 +36,17 @@ p.resize = function(w, h) {
 	this.height = h;
 	this.drawBackground();
 	this.background.cache(0, 0, this.width, this.height);
-	// TODO
+	this.drawNotes();
+};
+
+p.drawNotes = function() {
+	this.scrollingNotes.removeAllChildren();
+	for ( var i = 0; i < song.notes.length; ++i) {
+		this.addNote(song.notes[i].notePosition, song.notes[i].noteDuration,
+				midiToneToKeyNumber(song.notes[i].noteNumber), colorsForTracks[song.notes[i].noteTrack]);
+	}
+	this.scrollingNotes.cache(0, -song.songDuration * this.pixelsPerSecond, this.width, song.songDuration
+			* this.pixelsPerSecond + this.height);
 };
 
 p.drawBackground = function() {

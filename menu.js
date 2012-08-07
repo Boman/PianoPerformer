@@ -8,14 +8,13 @@ function loadSongs() {
 }
 
 function showMenu() {
-	$('#mainCanvas').hide();
-	$('#mainMenu').show();
+	stop = true;
+	$('#tabs').tabs().tabs('select', 'settingsTab');
 }
 
 var songFileName;
 function loadSong(fileName) {
-	$('#mainMenu').hide();
-	$('#mainCanvas').show();
+	$('#tabs').tabs().tabs('select', 'pianoTab');
 	songFileName = "resources/" + fileName;
 	initPiano();
 }

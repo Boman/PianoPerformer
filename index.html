@@ -7,6 +7,15 @@
 	src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 <script src="http://code.createjs.com/easeljs-0.4.2.min.js"></script>
 
+<link type="text/css"
+	href="libs/jquery-ui/css/ui-lightness/jquery-ui-1.8.22.custom.css"
+	rel="stylesheet" />
+<script type="text/javascript"
+	src="libs/jquery-ui/js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript"
+	src="libs/jquery-ui/js/jquery-ui-1.8.22.custom.min.js"></script>
+
+
 <script type="text/javascript" src="menu.js"></script>
 <script type="text/javascript" src="piano.js"></script>
 <script type="text/javascript" src="keyPane.js"></script>
@@ -21,6 +30,7 @@
 <script type="text/javascript">
 	//<![CDATA
 	$(function() {
+		$('#tabs').tabs();
 		loadSongs();
 	});
 	//]!>
@@ -40,17 +50,31 @@
 
 </head>
 <body>
-	<div id="mainMenu">
-		<h1>PianoPerformer</h1>
-		<h3>Song Selection</h3>
-		<table id="songTable">
-			<tbody>
-				<tr>
-					<th>title</th>
-				</tr>
-			</tbody>
-		</table>
+	<div id="tabs">
+		<ul>
+			<li><a href="#selectionTab">Song Selection</a></li>
+			<li><a href="#settingsTab">Song Settings</a></li>
+			<li><a href="#pianoTab">Piano</a></li>
+			<li><a href="#accountTab">Settings</a></li>
+		</ul>
+		<div id="selectionTab">
+			<div id="mainMenu">
+				<h1>PianoPerformer</h1>
+				<h3>Song Selection</h3>
+				<table id="songTable">
+					<tbody>
+						<tr>
+							<th>title</th>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<div id="settingsTab"></div>
+		<div id="pianoTab">
+			<canvas id="mainCanvas"></canvas>
+		</div>
+		<div id="accountTab"></div>
 	</div>
-	<canvas id="mainCanvas"></canvas>
 </body>
-</head>
+</html>
