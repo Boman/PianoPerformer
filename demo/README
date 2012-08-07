@@ -1,0 +1,20 @@
+### PianoPerformer ###
+
+This project aims to create a HTML5 code basis for piano players
+to read in their .mid files and let them show the keys to press
+in a waterfall like animation.
+
+planned features:
+ - Midi Keyboard input for interactive speed mode
+
+libs:
+ - MIDI.js https://github.com/mudcube/MIDI.js
+ - jasmid (Matt Westcott & Ben Firshman)
+ - audiolet https://github.com/oampo/Audiolet/wiki
+ - https://github.com/abudaan/midibridge-js
+
+icons:
+ - http://findicons.com/pack/653/the_spherical (CC-By-SA)
+
+license:
+ - GPL v3

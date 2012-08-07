@@ -1,0 +1,19 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+
+body,html {
+	background-color: #444;
+	height: 100%;
+}
+
+#mainCanvas {
+	width: 100%;
+}
+
+#pianoTab {
+	margin: 0;
+	padding: 5;
+	overflow: auto;
+}
